@@ -9,6 +9,7 @@ type BytesReader interface {
 	NextByte() byte
 	NextBytes() []byte
 	NextString() string
+	NextError() error
 	NextInt8() int8
 	NextInt16() int16
 	NextInt32() int32
