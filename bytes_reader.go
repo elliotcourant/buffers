@@ -2,6 +2,7 @@ package buffers
 
 import (
 	"encoding/binary"
+	"errors"
 )
 
 type BytesReader interface {
@@ -38,10 +39,22 @@ func (b *bytesReader) NextByte() byte {
 }
 
 func (b *bytesReader) NextBytes() []byte {
-	length := b.NextUint32()
-	i := b.data[b.offset : b.offset+length]
-	b.offset += length
+	length := b.NextInt32()
+	if length == -1 {
+		return nil
+	}
+	i := b.data[b.offset : b.offset+uint32(length)]
+	b.offset += uint32(length)
 	return i
+}
+
+func (b *bytesReader) NextError() error {
+	eBytes := b.NextBytes()
+	if eBytes == nil {
+		return nil
+	} else {
+		return errors.New(string(eBytes))
+	}
 }
 
 func (b *bytesReader) NextString() string {

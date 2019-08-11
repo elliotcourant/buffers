@@ -15,6 +15,7 @@ type BytesBuffer interface {
 	Append(bytes ...byte)
 	AppendByte(byte byte)
 	AppendString(str string)
+	AppendError(err error)
 	AppendUint8(item uint8)
 	AppendUint16(item uint16)
 	AppendUint32(item uint32)
@@ -48,8 +49,20 @@ func (b *bytesBuffer) AppendByte(byte byte) {
 }
 
 func (b *bytesBuffer) Append(bytes ...byte) {
-	b.AppendUint32(uint32(len(bytes)))
+	if bytes == nil {
+		b.AppendInt32(-1)
+		return
+	}
+	b.AppendInt32(int32(len(bytes)))
 	b.buf = append(b.buf, bytes...)
+}
+
+func (b *bytesBuffer) AppendError(err error) {
+	if err == nil {
+		b.Append(nil...)
+	} else {
+		b.AppendString(err.Error())
+	}
 }
 
 func (b *bytesBuffer) AppendString(str string) {
