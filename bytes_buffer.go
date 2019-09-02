@@ -2,6 +2,7 @@ package buffers
 
 import (
 	"encoding/binary"
+	"math"
 )
 
 const (
@@ -15,6 +16,7 @@ type BytesBuffer interface {
 	Append(bytes ...byte)
 	AppendByte(byte byte)
 	AppendString(str string)
+	AppendShortString(str string)
 	AppendError(err error)
 	AppendUint8(item uint8)
 	AppendUint16(item uint16)
@@ -57,6 +59,18 @@ func (b *bytesBuffer) Append(bytes ...byte) {
 	b.buf = append(b.buf, bytes...)
 }
 
+func (b *bytesBuffer) AppendShort(bytes ...byte) {
+	if bytes == nil {
+		b.AppendUint8(0)
+		return
+	}
+	if len(bytes) > math.MaxUint8 {
+		panic("too many bytes for short array")
+	}
+	b.AppendUint8(uint8(len(bytes)))
+	b.buf = append(b.buf, bytes...)
+}
+
 func (b *bytesBuffer) AppendError(err error) {
 	if err == nil {
 		b.Append(nil...)
@@ -67,6 +81,10 @@ func (b *bytesBuffer) AppendError(err error) {
 
 func (b *bytesBuffer) AppendString(str string) {
 	b.Append([]byte(str)...)
+}
+
+func (b *bytesBuffer) AppendShortString(str string) {
+	b.AppendShort([]byte(str)...)
 }
 
 func (b *bytesBuffer) AppendUint8(item uint8) {

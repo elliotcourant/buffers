@@ -9,6 +9,7 @@ type BytesReader interface {
 	NextByte() byte
 	NextBytes() []byte
 	NextString() string
+	NextShortString() string
 	NextError() error
 	NextInt8() int8
 	NextInt16() int16
@@ -49,6 +50,16 @@ func (b *bytesReader) NextBytes() []byte {
 	return i
 }
 
+func (b *bytesReader) NextShortBytes() []byte {
+	length := b.NextUint8()
+	if length == 0 {
+		return nil
+	}
+	i := b.data[b.offset : b.offset+uint32(length)]
+	b.offset += uint32(length)
+	return i
+}
+
 func (b *bytesReader) NextError() error {
 	eBytes := b.NextBytes()
 	if eBytes == nil {
@@ -60,6 +71,10 @@ func (b *bytesReader) NextError() error {
 
 func (b *bytesReader) NextString() string {
 	return string(b.NextBytes())
+}
+
+func (b *bytesReader) NextShortString() string {
+	return string(b.NextShortBytes())
 }
 
 func (b *bytesReader) NextInt8() int8 {
