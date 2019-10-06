@@ -14,6 +14,7 @@ const (
 
 type BytesBuffer interface {
 	Append(bytes ...byte)
+	AppendRaw(bytes []byte)
 	AppendByte(byte byte)
 	AppendString(str string)
 	AppendShortString(str string)
@@ -56,6 +57,10 @@ func (b *bytesBuffer) Append(bytes ...byte) {
 		return
 	}
 	b.AppendInt32(int32(len(bytes)))
+	b.buf = append(b.buf, bytes...)
+}
+
+func (b *bytesBuffer) AppendRaw(bytes []byte) {
 	b.buf = append(b.buf, bytes...)
 }
 
