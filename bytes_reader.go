@@ -3,6 +3,8 @@ package buffers
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
+	"reflect"
 )
 
 type BytesReader interface {
@@ -20,6 +22,7 @@ type BytesReader interface {
 	NextUint32() uint32
 	NextUint64() uint64
 	NextBool() bool
+	NextReflection(kind reflect.Kind) interface{}
 }
 
 func NewBytesReader(src []byte) BytesReader {
@@ -77,6 +80,11 @@ func (b *bytesReader) NextShortString() string {
 	return string(b.NextShortBytes())
 }
 
+func (b *bytesReader) NextBool() bool {
+	t := b.NextByte()
+	return t == 1
+}
+
 func (b *bytesReader) NextInt8() int8 {
 	return int8(b.NextUint8())
 }
@@ -97,11 +105,6 @@ func (b *bytesReader) NextUint8() uint8 {
 	return b.NextByte()
 }
 
-func (b *bytesReader) NextBool() bool {
-	t := b.NextByte()
-	return t == 1
-}
-
 func (b *bytesReader) NextUint16() uint16 {
 	i := b.data[b.offset : b.offset+Uint16Size]
 	b.offset += Uint16Size
@@ -118,4 +121,36 @@ func (b *bytesReader) NextUint64() uint64 {
 	i := b.data[b.offset : b.offset+Uint64Size]
 	b.offset += Uint64Size
 	return binary.BigEndian.Uint64(i)
+}
+
+func (b *bytesReader) NextReflection(kind reflect.Kind) interface{} {
+	switch kind {
+
+	case reflect.String:
+		return b.NextString()
+
+	case reflect.Bool:
+		return b.NextBool()
+
+	case reflect.Uint8:
+		return b.NextUint8()
+	case reflect.Uint16:
+		return b.NextUint16()
+	case reflect.Uint, reflect.Uint32:
+		return b.NextUint32()
+	case reflect.Uint64:
+		return b.NextUint64()
+
+	case reflect.Int8:
+		return b.NextInt8()
+	case reflect.Int16:
+		return b.NextInt16()
+	case reflect.Int, reflect.Int32:
+		return b.NextInt32()
+	case reflect.Int64:
+		return b.NextInt64()
+
+	default:
+		panic(fmt.Sprintf("cannot read %s", kind))
+	}
 }

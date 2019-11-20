@@ -2,7 +2,9 @@ package buffers
 
 import (
 	"encoding/binary"
+	"fmt"
 	"math"
+	"reflect"
 )
 
 const (
@@ -29,6 +31,7 @@ type BytesBuffer interface {
 	AppendBool(item bool)
 	AppendNil32()
 	AppendBuffer(buffer BytesBuffer)
+	AppendReflection(value reflect.Value)
 
 	Bytes() []byte
 }
@@ -114,6 +117,10 @@ func (b *bytesBuffer) AppendUint64(item uint64) {
 	binary.BigEndian.PutUint64(b.buf[wp:], item)
 }
 
+func (b *bytesBuffer) AppendInt8(item int8) {
+	b.AppendUint8(uint8(item))
+}
+
 func (b *bytesBuffer) AppendInt16(item int16) {
 	b.AppendUint16(uint16(item))
 }
@@ -141,4 +148,40 @@ func (b *bytesBuffer) AppendNil32() {
 
 func (b *bytesBuffer) Bytes() []byte {
 	return b.buf
+}
+
+func (b *bytesBuffer) AppendReflection(value reflect.Value) {
+	for value.Kind() == reflect.Ptr {
+		value = value.Elem()
+	}
+
+	switch value.Kind() {
+
+	case reflect.String:
+		b.AppendString(value.String())
+
+	case reflect.Bool:
+		b.AppendBool(value.Bool())
+
+	case reflect.Uint8:
+		b.AppendUint8(uint8(value.Uint()))
+	case reflect.Uint16:
+		b.AppendUint16(uint16(value.Uint()))
+	case reflect.Uint, reflect.Uint32:
+		b.AppendUint32(uint32(value.Uint()))
+	case reflect.Uint64:
+		b.AppendUint64(value.Uint())
+
+	case reflect.Int8:
+		b.AppendInt8(int8(value.Int()))
+	case reflect.Int16:
+		b.AppendInt16(int16(value.Int()))
+	case reflect.Int, reflect.Int32:
+		b.AppendInt32(int32(value.Int()))
+	case reflect.Int64:
+		b.AppendInt64(value.Int())
+
+	default:
+		panic(fmt.Sprintf("cannot append %s", value.Kind()))
+	}
 }
