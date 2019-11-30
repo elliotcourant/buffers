@@ -136,7 +136,9 @@ func (b *bytesReader) NextReflection(kind reflect.Kind) interface{} {
 		return b.NextUint8()
 	case reflect.Uint16:
 		return b.NextUint16()
-	case reflect.Uint, reflect.Uint32:
+	case reflect.Uint:
+		return uint(b.NextUint32())
+	case reflect.Uint32:
 		return b.NextUint32()
 	case reflect.Uint64:
 		return b.NextUint64()
@@ -145,7 +147,9 @@ func (b *bytesReader) NextReflection(kind reflect.Kind) interface{} {
 		return b.NextInt8()
 	case reflect.Int16:
 		return b.NextInt16()
-	case reflect.Int, reflect.Int32:
+	case reflect.Int:
+		return int(b.NextInt32())
+	case reflect.Int32:
 		return b.NextInt32()
 	case reflect.Int64:
 		return b.NextInt64()

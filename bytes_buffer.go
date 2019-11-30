@@ -167,7 +167,9 @@ func (b *bytesBuffer) AppendReflection(value reflect.Value) {
 		b.AppendUint8(uint8(value.Uint()))
 	case reflect.Uint16:
 		b.AppendUint16(uint16(value.Uint()))
-	case reflect.Uint, reflect.Uint32:
+	case reflect.Uint:
+		b.AppendUint32(uint32(value.Uint()))
+	case reflect.Uint32:
 		b.AppendUint32(uint32(value.Uint()))
 	case reflect.Uint64:
 		b.AppendUint64(value.Uint())
@@ -176,7 +178,9 @@ func (b *bytesBuffer) AppendReflection(value reflect.Value) {
 		b.AppendInt8(int8(value.Int()))
 	case reflect.Int16:
 		b.AppendInt16(int16(value.Int()))
-	case reflect.Int, reflect.Int32:
+	case reflect.Int:
+		b.AppendInt32(int32(value.Int()))
+	case reflect.Int32:
 		b.AppendInt32(int32(value.Int()))
 	case reflect.Int64:
 		b.AppendInt64(value.Int())
