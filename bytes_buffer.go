@@ -56,7 +56,7 @@ func (b *bytesBuffer) AppendByte(byte byte) {
 
 func (b *bytesBuffer) Append(bytes ...byte) {
 	if bytes == nil {
-		b.AppendInt32(-1)
+		b.AppendInt32(-1 + 4)
 		return
 	}
 	b.AppendInt32(int32(len(bytes)) + 4)
