@@ -59,7 +59,7 @@ func (b *bytesBuffer) Append(bytes ...byte) {
 		b.AppendInt32(-1)
 		return
 	}
-	b.AppendInt32(int32(len(bytes)))
+	b.AppendInt32(int32(len(bytes)) + 4)
 	b.buf = append(b.buf, bytes...)
 }
 

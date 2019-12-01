@@ -44,7 +44,7 @@ func (b *bytesReader) NextByte() byte {
 }
 
 func (b *bytesReader) NextBytes() []byte {
-	length := b.NextInt32()
+	length := b.NextInt32() - 4
 	if length == -1 {
 		return nil
 	}
