@@ -143,7 +143,7 @@ func (b *bytesBuffer) AppendBool(item bool) {
 }
 
 func (b *bytesBuffer) AppendNil32() {
-	b.AppendInt32(-1)
+	b.AppendInt32(-1 + 4)
 }
 
 func (b *bytesBuffer) Bytes() []byte {
